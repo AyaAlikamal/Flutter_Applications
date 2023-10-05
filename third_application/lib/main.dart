@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(MaterialApp(
@@ -21,15 +22,25 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
+  int leftimage = 1;
+  int rightimage = 1;
+  void Change_Right_Image() {
+    rightimage = Random().nextInt(8) + 1;
+  }
+
+  void Change_Left_Image() {
+    leftimage = Random().nextInt(8) + 1;
+  }
+
   @override
   Widget build(BuildContext context) {
-    int leftimage = 1;
-    int rightimage = 3;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          'Please Try again.',
+        Text(
+          leftimage == rightimage
+              ? 'Two photos are idintical'
+              : 'Please Try again.',
           style: TextStyle(
             fontSize: 30.0,
             color: Colors.black,
@@ -41,22 +52,23 @@ class _ImagePageState extends State<ImagePage> {
           child: Row(
             children: [
               Expanded(
-                child: FilledButton(
+                child: ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      leftimage = 2;
-                      // print("the left button has pressed");
+                      Change_Left_Image();
                     });
                   },
                   child: Image.asset('images/image-$leftimage.png'),
                 ),
               ),
+              SizedBox(
+                width: 50.0,
+              ),
               Expanded(
-                child: FilledButton(
+                child: ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      rightimage = 4;
-                      // print("the right button has pressed");
+                      Change_Right_Image();
                     });
                   },
                   child: Image.asset('images/image-$rightimage.png'),
