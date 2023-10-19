@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:game_app/question.dart';
-import 'question.dart';
+import "app_brain.dart";
+import 'package:rflutter_alert/rflutter_alert.dart';
 
+AppBrain appbrain = AppBrain();
 void main() {
   runApp(Exam_App());
 }
@@ -37,61 +38,75 @@ class Exam_App extends StatelessWidget {
 
 class Exam_Page extends StatefulWidget {
   const Exam_Page({super.key});
-
   @override
   State<Exam_Page> createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<Exam_Page> {
-  List<Padding> Answer_Results = [];
-  List<String> Qusetions = [
-    "عدد الكواكب في المجموعة الشمسية هو 8 كواكب؟",
-    " الارض مسطحة ليست كروية؟",
-    "القطط من الحيوانات الاليفة؟",
-    "الصين توجد في قارة افرقيا؟",
-    "يستطيع الانسان ان يعيش بدون اكل اللحوم؟",
-  ];
-  List<String> Qusetion_Images = [
-    "images/image-1.jpg",
-    "images/image-3.jpg",
-    "images/image-2.jpg",
-    "images/image-4.jpg",
-    "images/image-5.jpg"
-  ];
-  List<bool> Answers = [true, true, true, false, true];
-  int Qusetion_Number = 0;
-  List<Qusetion> Qusetion_Group = [
-      Qusetion qusetion_1 = Qusetion{
-      q: "عدد الكواكب في المجموعة الشمسية هو 8 كواكب؟",
-      i: "images/image-1.jpg",
-      a: true,
-      }
+  List<Widget> Answer_Results = [];
+  int RightAnswers = 0;
 
-       Qusetion qusetion_2 = Qusetion{
-      q: " الارض مسطحة ليست كروية؟",
-      i: "images/image-2.jpg",
-      a: true,
+  void Check_Answer(bool user_picked) {
+    bool correct_answer = appbrain.GetQuestionAnswer();
+    setState(() {
+      if (user_picked == correct_answer) {
+        RightAnswers++;
+        print('right answer');
+        Answer_Results.add(
+          Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Icon(
+              Icons.thumb_up,
+              color: Colors.green,
+            ),
+          ),
+        );
+      } else {
+        print('wrong answer');
+        Answer_Results.add(
+          Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Icon(
+              Icons.thumb_down,
+              color: const Color.fromARGB(255, 151, 19, 9),
+            ),
+          ),
+        );
       }
-
-       Qusetion qusetion_3 = Qusetion{
-      q: "القطط من الحيوانات الاليفة؟",
-      i: "images/image-3.jpg",
-      a: true,
+      if (appbrain.Fished() == true) {
+        Alert(
+          style: AlertStyle(
+            backgroundColor: Color.fromARGB(255, 13, 156, 172),
+          ),
+          context: context,
+          title: "Exam Finished",
+          desc: "you have answered $RightAnswers right from 7 questions",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Start again",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              color: Colors.blueGrey,
+              onPressed: () => Navigator.pop(context),
+              width: 120,
+            )
+          ],
+        ).show();
+        appbrain.Rest();
+        Answer_Results = [];
+        RightAnswers = 0;
+      } else {
+        appbrain.NextQuestion();
       }
+    });
+  }
 
-
-       Qusetion qusetion_4 = Qusetion{
-      q: "الصين توجد في قارة افرقيا؟",
-      i: "images/image-4.jpg",
-      a: false,
-      }
-
-       Qusetion qusetion_5 = Qusetion{
-      q: "يستطيع الانسان ان يعيش بدون اكل اللحوم؟",
-      i: "images/image-5.jpg",
-      a: true,
-      }
-  ];
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -105,13 +120,13 @@ class _MyWidgetState extends State<Exam_Page> {
           child: Column(
             children: [
               Image.asset(
-                Qusetion_Images[Qusetion_Number],
+                appbrain.GetQuestionImage(),
               ),
               SizedBox(
                 height: 20.0,
               ),
               Text(
-                Qusetions[Qusetion_Number],
+                appbrain.GetQuestionText(),
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 25.0,
@@ -130,7 +145,7 @@ class _MyWidgetState extends State<Exam_Page> {
                 backgroundColor: Colors.cyan,
               ),
               child: Text(
-                "صح",
+                "True",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 25.0,
@@ -138,26 +153,7 @@ class _MyWidgetState extends State<Exam_Page> {
                 ),
               ),
               onPressed: () {
-                bool correct_answer = Answers[Qusetion_Number];
-                if (correct_answer == true) {
-                  print('right answer');
-                  print(qusetion_1.Qusetion_Text);
-                  print(qusetion_1.Qusetion_Answer);
-                } else {
-                  print('wrong answer');
-                }
-                setState(() {
-                  Qusetion_Number++;
-                  Answer_Results.add(
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Icon(
-                        Icons.thumb_up,
-                        color: Colors.green,
-                      ),
-                    ),
-                  );
-                });
+                Check_Answer(true);
               },
             ),
           ),
@@ -170,7 +166,7 @@ class _MyWidgetState extends State<Exam_Page> {
                 backgroundColor: const Color.fromARGB(255, 66, 8, 4),
               ),
               child: Text(
-                "خطأ",
+                "False",
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 25.0,
@@ -178,18 +174,7 @@ class _MyWidgetState extends State<Exam_Page> {
                 ),
               ),
               onPressed: () {
-                setState(() {
-                  Qusetion_Number++;
-                  Answer_Results.add(
-                    Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Icon(
-                        Icons.thumb_down,
-                        color: Colors.red,
-                      ),
-                    ),
-                  );
-                });
+                Check_Answer(false);
               },
             ),
           ),
