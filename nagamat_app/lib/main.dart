@@ -1,9 +1,5 @@
-// import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
-// import 'package:just_audio/just_audio.dart';
 
 void main() {
   runApp(Music_App());
@@ -12,7 +8,8 @@ void main() {
 class Music_App extends StatelessWidget {
   void Play_Music(int music_number) {
     final player = AudioPlayer();
-    player.setSource(AssetSource('assets/music-$music_number.mp3'));
+    // player.setSource(AssetSource('assets/music$music_number.mp3-'));
+    player.play(DeviceFileSource('assets/music-$music_number.mp3'));
   }
 
   Expanded My_Button(int music_number, Color button_color, String button_text) {
